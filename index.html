@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#17143b">
+<title>Match &amp; Blast — Fruit Puzzle</title>
+<style>
+:root{--ink:#211b4b;--muted:#6e6a91;--pink:#ff5f9e;--purple:#7959f6;--mint:#4bd7b0;--gold:#ffd166;--panel:rgba(255,255,255,.92)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:ui-rounded,"Trebuchet MS",system-ui,-apple-system,sans-serif;color:var(--ink);background:radial-gradient(circle at 15% 12%,#ffe2f0 0,transparent 28%),radial-gradient(circle at 90% 18%,#d7f8ff 0,transparent 30%),linear-gradient(135deg,#f9f4ff,#e8f9ff 55%,#fff4df);padding:20px}
+.wrap{max-width:1040px;margin:0 auto}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:54px;height:54px;display:grid;place-items:center;border-radius:18px;background:linear-gradient(135deg,var(--pink),var(--purple));font-size:30px;box-shadow:0 8px 20px #7959f644}
+h1{font-size:clamp(1.5rem,4vw,2.3rem);line-height:1;margin:0;letter-spacing:-.04em}.subtitle{color:var(--muted);font-size:.9rem;margin-top:5px}
+.pill{background:#fff9;border:1px solid #fff;padding:9px 13px;border-radius:99px;font-size:.85rem;font-weight:800;white-space:nowrap}
+main{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(260px,.75fr);gap:18px;align-items:start}
+.panel{background:var(--panel);border:1px solid #ffffffd9;border-radius:25px;box-shadow:0 16px 45px #30245b12;padding:18px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat{background:#f5f2ff;border-radius:17px;padding:11px;text-align:center}.stat span{display:block;color:var(--muted);font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.07em}.stat strong{display:block;font-size:1.45rem;margin-top:2px}
+.board{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px;padding:8px;border-radius:20px;background:linear-gradient(135deg,#dcd4ff,#c7eaff);box-shadow:inset 0 2px 8px #4b3c8a18;touch-action:manipulation}
+.cell{aspect-ratio:1;border:0;border-radius:12px;min-width:0;display:grid;place-items:center;padding:0;font-size:clamp(1.15rem,4vw,2.15rem);cursor:pointer;background:#ffffffb8;box-shadow:0 3px 0 #a9a1d5;transition:transform .12s,background .12s,box-shadow .12s;user-select:none;-webkit-tap-highlight-color:transparent}
+.cell:hover{transform:translateY(-2px)}.cell.selected{background:#fff0a9;box-shadow:0 0 0 3px #ffad33,0 4px 0 #d6a44c;transform:scale(1.04)}.cell.hint{animation:hint .6s ease-in-out 2}.cell:focus-visible{outline:3px solid #211b4b;outline-offset:1px}
+@keyframes hint{50%{transform:scale(1.13);background:#fff0a9}}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+button.action{border:0;border-radius:13px;padding:11px 15px;font:inherit;font-weight:850;cursor:pointer;background:#eee9ff;color:#4a338f;transition:transform .12s,filter .12s}
+button.action:hover{filter:brightness(.97);transform:translateY(-1px)}button.primary{background:linear-gradient(135deg,var(--purple),#9a64ff);color:white;box-shadow:0 5px 12px #7959f633}
+.message{min-height:26px;color:var(--muted);font-size:.92rem;font-weight:700;margin:12px 2px 0}
+.side h2{margin:2px 0 8px;font-size:1.2rem}.side p{color:var(--muted);line-height:1.55;margin:0 0 14px}.goal{background:linear-gradient(135deg,#fff2d4,#fff9e9);border-radius:18px;padding:14px;margin:14px 0}.goal strong{font-size:1.25rem}.progress{height:9px;background:#eadfbf;border-radius:99px;overflow:hidden;margin-top:9px}.progress div{height:100%;width:0;background:linear-gradient(90deg,#ff9f43,#ff5f9e);transition:width .25s}
+.fruits{display:flex;gap:8px;font-size:1.7rem;flex-wrap:wrap;margin:12px 0}.howto{padding-left:20px;color:var(--muted);line-height:1.65}.howto li{padding:2px 0}.tip{border-left:4px solid var(--mint);padding:10px 12px;background:#eafff7;border-radius:0 12px 12px 0;color:#326c61;font-size:.9rem;line-height:1.5;margin-top:14px}
+footer{text-align:center;color:var(--muted);font-size:.8rem;margin:17px 0 5px}
+.overlay{position:fixed;inset:0;background:#17143bcc;display:none;place-items:center;padding:20px;z-index:5}.overlay.show{display:grid}.modal{max-width:390px;width:100%;background:white;border-radius:25px;padding:28px;text-align:center;box-shadow:0 20px 70px #0004}.modal .big{font-size:3.5rem}.modal h2{margin:8px 0}.modal p{color:var(--muted);line-height:1.5}
+@media(max-width:760px){body{padding:12px}header{align-items:flex-start}.pill{font-size:.75rem;padding:8px 10px}main{grid-template-columns:1fr}.panel{padding:13px}.side{display:grid;grid-template-columns:1fr;}.board{gap:4px;padding:6px}.cell{border-radius:9px;font-size:clamp(1.15rem,7vw,2rem)}}
+@media(max-width:370px){.subtitle{font-size:.78rem}.logo{width:45px;height:45px}.stat{padding:8px 4px}.stat strong{font-size:1.2rem}.cell{border-radius:7px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><div class="logo" aria-hidden="true">🍓</div><div><h1>Match <span style="color:#7959f6">&amp;</span> Blast</h1><div class="subtitle">A juicy little puzzle adventure</div></div></div>
+  <div class="pill">🍉 Fruit-tastic fun!</div>
+</header>
+<main>
+<section class="panel" aria-label="Game">
+  <div class="stats">
+    <div class="stat"><span>Score</span><strong id="score">0</strong></div>
+    <div class="stat"><span>Moves left</span><strong id="moves">25</strong></div>
+    <div class="stat"><span>Best score</span><strong id="best">0</strong></div>
+  </div>
+  <div id="board" class="board" role="grid" aria-label="Fruit matching board"></div>
+  <div class="controls">
+    <button class="action primary" id="newGame">↻ New game</button>
+    <button class="action" id="hint">✨ Hint</button>
+    <button class="action" id="shuffle">🔀 Shuffle</button>
+  </div>
+  <div id="message" class="message" aria-live="polite">Swap two neighbouring fruits to make a match of 3 or more.</div>
+</section>
+<aside class="panel side">
+  <h2>🍍 Today's fruity mission</h2>
+  <p>Make matches, build your score, and see how many points you can collect before your moves run out.</p>
+  <div class="goal"><div style="color:#927a4a;font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em">Target score</div><strong id="target">1,000 points</strong><div class="progress"><div id="progress"></div></div><p id="goalText" style="font-size:.84rem;margin:8px 0 0">You're on your way!</p></div>
+  <h2>How to play</h2>
+  <ol class="howto">
+    <li>Tap or click a fruit to select it.</li>
+    <li>Swap it with a fruit directly beside it.</li>
+    <li>Match 3 or more of the same fruit in a row or column.</li>
+    <li>Each fruit cleared earns points. Cascades earn even more!</li>
+  </ol>
+  <div class="fruits" aria-label="Fruit types"><span>🍒</span><span>🍋</span><span>🍇</span><span>🍊</span><span>🍏</span><span>🍓</span></div>
+  <div class="tip">💡 <strong>Pro tip:</strong> Look for matches near the bottom — falling fruits can create surprise combos!</div>
+</aside>
+</main>
+<footer>Match &amp; Blast · Made for curious minds everywhere 🌍</footer>
+</div>
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal"><div class="big" id="modalEmoji">🎉</div><h2 id="modalTitle">Great game!</h2><p id="modalText"></p><button class="action primary" id="playAgain">Play again 🍓</button></div>
+</div>
+<script>
+(() => {
+"use strict";
+const SIZE=8, TYPES=["🍒","🍋","🍇","🍊","🍏","🍓","🫐"];
+const TARGET=1000, START_MOVES=25;
+let grid=[], score=0, moves=START_MOVES, selected=null, busy=false, gameOver=false, hintTimer=null;
+const $=id=>document.getElementById(id);
+const boardEl=$("board");
+const safeBest=()=>{try{return Number(localStorage.getItem("matchBlastBest")||0)}catch(e){return 0}};
+let best=safeBest();
+function randType(){return Math.floor(Math.random()*TYPES.length)}
+function makeGrid(){
+  grid=Array.from({length:SIZE},()=>Array(SIZE).fill(0));
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+    let t; do{t=randType()}while((c>=2&&grid[r][c-1]===t&&grid[r][c-2]===t)||(r>=2&&grid[r-1][c]===t&&grid[r-2][c]===t));
+    grid[r][c]=t;
+  }
+}
+function render(){
+  boardEl.innerHTML="";
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+    const b=document.createElement("button");b.className="cell";b.type="button";b.setAttribute("role","gridcell");
+    b.setAttribute("aria-label",`${TYPES[grid[r][c]]}, row ${r+1}, column ${c+1}`);
+    b.textContent=TYPES[grid[r][c]];
+    if(selected&&selected.r===r&&selected.c===c)b.classList.add("selected");
+    b.addEventListener("click",()=>choose(r,c));boardEl.appendChild(b);
+  }
+  $("score").textContent=score.toLocaleString();
+  $("moves").textContent=moves;
+  $("best").textContent=best.toLocaleString();
+  $("progress").style.width=Math.min(100,score/TARGET*100)+"%";
+  $("goalText").textContent=score>=TARGET?"Target reached! Keep blasting!":`${Math.max(0,TARGET-score).toLocaleString()} points to reach your target.`;
+}
+function setMessage(s){$("message").textContent=s}
+function adjacent(a,b){return Math.abs(a.r-b.r)+Math.abs(a.c-b.c)===1}
+function choose(r,c){
+  if(busy||gameOver)return;
+  if(!selected){selected={r,c};render();return}
+  if(selected.r===r&&selected.c===c){selected=null;render();return}
+  const next={r,c};
+  if(!adjacent(selected,next)){selected=next;render();return}
+  const first=selected;selected=null;swap(first,next,true);
+}
+function swap(a,b,validate){
+  [grid[a.r][a.c],grid[b.r][b.c]]=[grid[b.r][b.c],grid[a.r][a.c]];
+  if(validate&&!findMatches().size){[grid[a.r][a.c],grid[b.r][b.c]]=[grid[b.r][b.c],grid[a.r][a.c]];render();setMessage("No match there — try a different swap!");return}
+  moves--;busy=true;render();setMessage("Blast! 🍓");
+  resolveMatches(1).then(()=>{busy=false;if(moves<=0)finishGame();else {render();if(score>=TARGET)setMessage("Target reached! Can you beat your best? 🎉");else setMessage("Nice match! Find your next combo.");}});
+}
+function findMatches(){
+  const found=new Set();
+  for(let r=0;r<SIZE;r++){let start=0;while(start<SIZE){let end=start+1;while(end<SIZE&&grid[r][end]===grid[r][start])end++;if(end-start>=3)for(let c=start;c<end;c++)found.add(r*SIZE+c);start=end;}}
+  for(let c=0;c<SIZE;c++){let start=0;while(start<SIZE){let end=start+1;while(end<SIZE&&grid[end][c]===grid[start][c])end++;if(end-start>=3)for(let r=start;r<end;r++)found.add(r*SIZE+c);start=end;}}
+  return found;
+}
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+async function resolveMatches(multiplier){
+  let matches=findMatches(), loops=0;
+  while(matches.size&&loops<12){
+    loops++;score+=matches.size*10*multiplier;
+    if(score>best){best=score;try{localStorage.setItem("matchBlastBest",String(best))}catch(e){}}
+    for(const index of matches){const cell=boardEl.children[index];if(cell)cell.style.transform="scale(.1) rotate(20deg)";grid[Math.floor(index/SIZE)][index%SIZE]=-1;}
+    $("score").textContent=score.toLocaleString();$("best").textContent=best.toLocaleString();$("progress").style.width=Math.min(100,score/TARGET*100)+"%";
+    await wait(150);
+    for(let c=0;c<SIZE;c++){
+      let write=SIZE-1;
+      for(let r=SIZE-1;r>=0;r--)if(grid[r][c]!==-1){grid[write][c]=grid[r][c];write--;}
+      while(write>=0){grid[write][c]=randType();write--;}
+    }
+    render();matches=findMatches();multiplier++;
+    if(matches.size){setMessage(`Combo x${multiplier}! 💥`);await wait(130);}
+  }
+}
+function finishGame(){
+  gameOver=true;$("modalEmoji").textContent=score>=TARGET?"🏆":"🍉";
+  $("modalTitle").textContent=score>=TARGET?"Mission accomplished!":"Nice playing!";
+  $("modalText").textContent=`You scored ${score.toLocaleString()} points. ${score>=TARGET?"You reached the target — amazing!":"Try again and see if you can beat your best score."} Your best is ${best.toLocaleString()}.`;
+  $("overlay").classList.add("show");
+}
+function newGame(){
+  if(hintTimer)clearTimeout(hintTimer);
+  score=0;moves=START_MOVES;selected=null;busy=false;gameOver=false;
+  $("overlay").classList.remove("show");makeGrid();render();setMessage("Swap two neighbouring fruits to make a match of 3 or more.");
+}
+function findHint(){
+  for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){
+    for(const [dr,dc] of [[0,1],[1,0]]){
+      const rr=r+dr,cc=c+dc;if(rr>=SIZE||cc>=SIZE)continue;
+      [grid[r][c],grid[rr][cc]]=[grid[rr][cc],grid[r][c]];
+      const valid=findMatches().size>0;
+      [grid[r][c],grid[rr][cc]]=[grid[rr][cc],grid[r][c]];
+      if(valid)return [{r,c},{r:rr,c:cc}];
+    }
+  }
+  return null;
+}
+$("newGame").addEventListener("click",newGame);
+$("playAgain").addEventListener("click",newGame);
+$("hint").addEventListener("click",()=>{
+  if(busy||gameOver)return;
+  const pair=findHint();
+  if(!pair){setMessage("Shuffling the fruits to find new moves!");shuffleBoard();return}
+  selected=null;render();
+  for(const p of pair){const el=boardEl.children[p.r*SIZE+p.c];if(el)el.classList.add("hint")}
+  setMessage("Try swapping the two glowing fruits! ✨");
+});
+function shuffleBoard(){
+  if(busy||gameOver)return;
+  for(let i=0;i<30;i++){for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++){let rr=Math.floor(Math.random()*SIZE),cc=Math.floor(Math.random()*SIZE);[grid[r][c],grid[rr][cc]]=[grid[rr][cc],grid[r][c]];}if(!findMatches().size&&findHint())break;}
+  selected=null;render();setMessage("Fresh board! Find a match. 🔀");
+}
+$("shuffle").addEventListener("click",shuffleBoard);
+newGame();
+})();
+</script>
+</body>
+</html>
